@@ -19,8 +19,9 @@ namespace TP.ConcurrentProgramming.Data
 
     public DataImplementation()
     {
-      MoveTimer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
-    }
+            //MoveTimer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
+            StartGameLoop();
+        }
 
     #endregion ctor
 
@@ -35,10 +36,14 @@ namespace TP.ConcurrentProgramming.Data
       Random random = new Random();
       for (int i = 0; i < numberOfBalls; i++)
       {
-        Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
-        Ball newBall = new(startingPosition, startingPosition);
-        upperLayerHandler(startingPosition, newBall);
-        BallsList.Add(newBall);
+            Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
+            double xVelocity = random.Next(-80, 80);
+            double yVelocity = Math.Sqrt(6400 - xVelocity * xVelocity);
+            double initialDiameter = random.Next(10, 40);
+            Vector startingVelocity = new(xVelocity, yVelocity);
+            Ball newBall = new(startingPosition, startingVelocity, initialDiameter);
+            upperLayerHandler(startingPosition, newBall);
+            BallsList.Add(newBall);
       }
     }
 
@@ -79,17 +84,38 @@ namespace TP.ConcurrentProgramming.Data
     private Random RandomGenerator = new();
     private List<Ball> BallsList = [];
 
-    private void Move(object? x)
+    private void Move(double deltaTime)
     {
       foreach (Ball item in BallsList)
-        item.Move(new Vector((RandomGenerator.NextDouble() - 0.5) * 10, (RandomGenerator.NextDouble() - 0.5) * 10));
+        item.Move(new Vector(item.Velocity.x * deltaTime, item.Velocity.y * deltaTime));
     }
 
-    #endregion private
+        private void StartGameLoop()
+        {
+            Task.Run(() =>
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                long lastUpdate = stopwatch.ElapsedMilliseconds;
 
-    #region TestingInfrastructure
+                while (true)
+                {
+                    long now = stopwatch.ElapsedMilliseconds;
+                    double deltaTime = (now - lastUpdate) / 1000.0;
+                    lastUpdate = now;
 
-    [Conditional("DEBUG")]
+                    Move(deltaTime);
+
+                    Thread.Sleep(10);
+                }
+            });
+        }
+
+        #endregion private
+
+        #region TestingInfrastructure
+
+        [Conditional("DEBUG")]
     internal void CheckBallsList(Action<IEnumerable<IBall>> returnBallsList)
     {
       returnBallsList(BallsList);

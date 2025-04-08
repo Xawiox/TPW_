@@ -63,9 +63,9 @@ namespace TP.ConcurrentProgramming.Presentation.Model
     private readonly IObservable<EventPattern<BallChaneEventArgs>> eventObservable = null;
     private readonly UnderneathLayerAPI layerBellow = null;
 
-    private void StartHandler(BusinessLogic.IPosition position, BusinessLogic.IBall ball)
+    private void StartHandler(BusinessLogic.IPosition position, BusinessLogic.IBall ball, double dataDiameter)
     {
-      ModelBall newBall = new ModelBall(position.x, position.y, ball) { Diameter = 20.0 };
+      ModelBall newBall = new ModelBall(position.x - dataDiameter, position.y - dataDiameter, ball) { Diameter = dataDiameter };
       BallChanged.Invoke(this, new BallChaneEventArgs() { Ball = newBall });
     }
 
