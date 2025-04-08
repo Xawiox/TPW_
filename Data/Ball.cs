@@ -10,31 +10,31 @@
 
 namespace TP.ConcurrentProgramming.Data
 {
-  internal class Ball : IBall
-  {
-    #region ctor
-
-    internal Ball(Vector initialPosition, Vector initialVelocity, double initialDiameter)
+    internal class Ball : IBall
     {
-      Position = initialPosition;
-      Velocity = initialVelocity;
+        #region ctor
+
+        internal Ball(Vector initialPosition, Vector initialVelocity, double initialDiameter)
+        {
+            Position = initialPosition;
+            Velocity = initialVelocity;
             Diameter = initialDiameter;
-    }
+        }
 
-    #endregion ctor
+        #endregion ctor
 
-    #region IBall
+        #region IBall
 
-    public event EventHandler<IVector>? NewPositionNotification;
+        public event EventHandler<IVector>? NewPositionNotification;
 
-    public IVector Velocity { get; set; }
+        public IVector Velocity { get; set; }
         public double Diameter { get; init; } = 0;
 
 
-        public void SetVelocity (double x, double y) 
-    {
+        public void SetVelocity(double x, double y)
+        {
             this.Velocity = new Vector(x, y);
-    }
+        }
 
         public void SetPosition(double x, double y)
         {
@@ -47,17 +47,17 @@ namespace TP.ConcurrentProgramming.Data
 
         public IVector Position { get; set; }
 
-    private void RaiseNewPositionChangeNotification()
-    {
-      NewPositionNotification?.Invoke(this, Position);
-    }
+        private void RaiseNewPositionChangeNotification()
+        {
+            NewPositionNotification?.Invoke(this, Position);
+        }
 
-    internal void Move(Vector delta)
-    {
-      Position = new Vector(Position.x + delta.x, Position.y + delta.y);
-      RaiseNewPositionChangeNotification();
-    }
+        internal void Move(Vector delta)
+        {
+            Position = new Vector(Position.x + delta.x, Position.y + delta.y);
+            RaiseNewPositionChangeNotification();
+        }
 
-    #endregion private
-  }
+        #endregion private
+    }
 }
