@@ -134,8 +134,6 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
 
         private void ExecuteStartCommand()
         {
-            Balls.Clear();
-
             Start(NumberOfBalls);
 
             IsStartEnabled = false;
