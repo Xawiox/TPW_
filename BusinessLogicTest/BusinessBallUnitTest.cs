@@ -67,5 +67,60 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         }
 
         #endregion testing instrumentation
+
+        [TestMethod]
+        public void BallBounceTest()
+        {
+            TestVector initialPosition = new TestVector(395.0, 20.0);
+            TestVector initialVelocity = new TestVector(20.0, 0.0);
+            TestBall testBall = new TestBall
+            {
+                Position = initialPosition,
+                Velocity = initialVelocity,
+                Diameter = 10.0
+            };
+
+            Ball businessBall = new Ball(testBall);
+
+            testBall.TriggerPositionChange();
+
+            Assert.AreEqual(-20.0, testBall.Velocity.x);
+            Assert.IsTrue(testBall.Position.x < 395.0);
+        }
+
+        public class TestVector : TP.ConcurrentProgramming.Data.IVector
+        {
+            public double x { get; init; }
+            public double y { get; init; }
+
+            public TestVector(double x, double y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        public class TestBall : TP.ConcurrentProgramming.Data.IBall
+        {
+            public event EventHandler<Data.IVector>? NewPositionNotification;
+            public TP.ConcurrentProgramming.Data.IVector Velocity { get; set; }
+            public TP.ConcurrentProgramming.Data.IVector Position { get; set; }
+            public double Diameter { get; init; }
+
+            public void SetVelocity(double x, double y)
+            {
+                Velocity = new TestVector(x, y);
+            }
+
+            public void SetPosition(double x, double y)
+            {
+                Position = new TestVector(x, y);
+            }
+
+            public void TriggerPositionChange()
+            {
+                NewPositionNotification?.Invoke(this, Position);
+            }
+        }
     }
 }
