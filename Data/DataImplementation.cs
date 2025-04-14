@@ -10,17 +10,17 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace TP.ConcurrentProgramming.Data
 {
     internal class DataImplementation : DataAbstractAPI
     {
         #region ctor
-
+        private CancellationTokenSource _cancellationTokenSource = new();
         public DataImplementation()
         {
             //MoveTimer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
-
         }
 
         #endregion ctor
@@ -37,8 +37,10 @@ namespace TP.ConcurrentProgramming.Data
             for (int i = 0; i < numberOfBalls; i++)
             {
                 Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
-                double xVelocity = random.Next(-80, 80);
-                double yVelocity = Math.Sqrt(6400 - xVelocity * xVelocity);
+                int velocity = 80;
+                double angle = random.NextDouble() * 2 * Math.PI;
+                double xVelocity = velocity * Math.Cos(angle);
+                double yVelocity = velocity * Math.Sin(angle);
                 double initialDiameter = random.Next(10, 40);
                 Vector startingVelocity = new(xVelocity, yVelocity);
                 Ball newBall = new(startingPosition, startingVelocity, initialDiameter);
@@ -58,6 +60,9 @@ namespace TP.ConcurrentProgramming.Data
             {
                 if (disposing)
                 {
+                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource.Dispose();
+
                     BallsList.Clear();
                 }
                 Disposed = true;
@@ -95,7 +100,7 @@ namespace TP.ConcurrentProgramming.Data
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 long lastUpdate = stopwatch.ElapsedMilliseconds;
-
+                var token = _cancellationTokenSource.Token;
                 while (true)
                 {
                     long now = stopwatch.ElapsedMilliseconds;
@@ -106,7 +111,7 @@ namespace TP.ConcurrentProgramming.Data
 
                     Thread.Sleep(10);
                 }
-            });
+            }, _cancellationTokenSource.Token);
         }
 
         #endregion private
