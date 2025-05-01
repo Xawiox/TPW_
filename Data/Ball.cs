@@ -13,6 +13,8 @@ namespace TP.ConcurrentProgramming.Data
     internal class Ball : IBall
     {
         #region ctor
+        private ReaderWriterLockSlim _lockVelocity = new();
+        private ReaderWriterLockSlim _lockPosition = new();
 
         internal Ball(Vector initialPosition, Vector initialVelocity, double initialDiameter)
         {
@@ -33,14 +35,55 @@ namespace TP.ConcurrentProgramming.Data
 
         public void SetVelocity(double x, double y)
         {
-            this.Velocity = new Vector(x, y);
+            _lockVelocity.EnterWriteLock();
+            try
+            {
+                this.Velocity = new Vector(x, y);
+            }
+            finally
+            {
+                _lockVelocity.ExitWriteLock();
+            }
+        }
+
+        public IVector GetVelocity()
+        {
+            _lockVelocity.EnterReadLock();
+            try
+            {
+                return this.Position;
+            }
+            finally
+            {
+                _lockVelocity.ExitReadLock();
+            }
         }
 
         public void SetPosition(double x, double y)
         {
-            this.Position = new Vector(x, y);
+            _lockPosition.EnterWriteLock();
+            try
+            {
+                this.Position = new Vector(x, y);
+            }
+            finally
+            {
+                _lockPosition.ExitWriteLock();
+            }
         }
 
+        public IVector GetPosition()
+        {
+            _lockPosition.EnterReadLock();
+            try
+            {
+                return this.Position;
+            }
+            finally
+            {
+                _lockPosition.ExitReadLock();
+            }
+        }
         #endregion IBall
 
         #region private
@@ -52,9 +95,9 @@ namespace TP.ConcurrentProgramming.Data
             NewPositionNotification?.Invoke(this, Position);
         }
 
-        internal void Move(Vector delta)
+        internal void Move(double delta)
         {
-            Position = new Vector(Position.x + delta.x, Position.y + delta.y);
+            SetPosition(Position.x + delta * Velocity.x, Position.y + delta * Velocity.y);
             RaiseNewPositionChangeNotification();
         }
 
