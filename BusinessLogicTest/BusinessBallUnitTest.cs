@@ -25,10 +25,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             VectorFixture fixtureVelocity = new(0.0, 0.0);
             DataBallFixture dataBallFixture = new DataBallFixture(fixturePosition, fixtureVelocity, fixtureDiameter);
             Ball newInstance = new(dataBallFixture);
-            int numberOfCallBackCalled = 0;
-            newInstance.NewPositionNotification += (sender, position) => { Assert.IsNotNull(sender); Assert.IsNotNull(position); numberOfCallBackCalled++; };
-            dataBallFixture.Move();
-            Assert.AreEqual<int>(1, numberOfCallBackCalled);
+            newInstance.Move(1);
+            Assert.AreNotEqual<IVector>(fixturePosition, dataBallFixture.Position);
         }
 
         #region testing instrumentation
@@ -82,7 +80,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
 
             Ball businessBall = new Ball(testBall);
 
-            testBall.TriggerPositionChange();
+            businessBall.Move(1);
 
             Assert.AreEqual(-20.0, testBall.Velocity.x);
             Assert.IsTrue(testBall.Position.x < 395.0);

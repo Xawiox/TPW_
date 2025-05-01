@@ -51,7 +51,7 @@ namespace TP.ConcurrentProgramming.Data
             _lockVelocity.EnterReadLock();
             try
             {
-                return this.Position;
+                return this.Velocity;
             }
             finally
             {
@@ -90,16 +90,17 @@ namespace TP.ConcurrentProgramming.Data
 
         public IVector Position { get; set; }
 
-        private void RaiseNewPositionChangeNotification()
-        {
-            NewPositionNotification?.Invoke(this, Position);
-        }
+        //private void RaiseNewPositionChangeNotification()
+        //{
+        //    NewPositionNotification?.Invoke(this, Position);
+        //}
 
-        internal void Move(double delta)
-        {
-            SetPosition(Position.x + delta * Velocity.x, Position.y + delta * Velocity.y);
-            RaiseNewPositionChangeNotification();
-        }
+        //internal void Move(double delta)
+        //{
+        //    //SetPosition(Position.x + delta * Velocity.x, Position.y + delta * Velocity.y);
+
+        //    RaiseNewPositionChangeNotification();
+        //}
 
         #endregion private
     }

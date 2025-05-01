@@ -17,8 +17,8 @@ namespace TP.ConcurrentProgramming.Data
     internal class DataImplementation : DataAbstractAPI
     {
         #region ctor
-        private CancellationTokenSource _cancellationTokenSource = new();
-        private Barrier _barrier;
+        //private CancellationTokenSource _cancellationTokenSource = new();
+        //private Barrier _barrier;
         public DataImplementation()
         {
             //MoveTimer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(10));
@@ -35,7 +35,7 @@ namespace TP.ConcurrentProgramming.Data
             if (upperLayerHandler == null)
                 throw new ArgumentNullException(nameof(upperLayerHandler));
             Random random = new Random();
-            _barrier = new Barrier(numberOfBalls);
+            //_barrier = new Barrier(numberOfBalls);
             for (int i = 0; i < numberOfBalls; i++)
             {
                 Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
@@ -48,7 +48,7 @@ namespace TP.ConcurrentProgramming.Data
                 Ball newBall = new(startingPosition, startingVelocity, initialDiameter);
                 upperLayerHandler(startingPosition, newBall);
                 BallsList.Add(newBall);
-                StartGameLoop(newBall);
+                //StartGameLoop(newBall);
             }
             
         }
@@ -63,8 +63,8 @@ namespace TP.ConcurrentProgramming.Data
             {
                 if (disposing)
                 {
-                    _cancellationTokenSource.Cancel();
-                    _cancellationTokenSource.Dispose();
+                    //_cancellationTokenSource.Cancel();
+                    //_cancellationTokenSource.Dispose();
 
                     BallsList.Clear();
                 }
@@ -89,28 +89,6 @@ namespace TP.ConcurrentProgramming.Data
         private bool Disposed = false;
 
         private List<Ball> BallsList = [];
-
-
-        private void StartGameLoop(Ball newBall)
-        {
-            Task.Run(() =>
-            {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                long lastUpdate = stopwatch.ElapsedMilliseconds;
-                var token = _cancellationTokenSource.Token;
-                while (!token.IsCancellationRequested)
-                {
-                    long now = stopwatch.ElapsedMilliseconds;
-                    double deltaTime = (now - lastUpdate) / 1000.0;
-                    lastUpdate = now;
-
-                    newBall.Move(deltaTime);
-                    _barrier.SignalAndWait();
-                    Thread.Sleep(10);
-                }
-            }, _cancellationTokenSource.Token);
-        }
 
         #endregion private
 
