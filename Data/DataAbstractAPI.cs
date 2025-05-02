@@ -61,6 +61,9 @@ namespace TP.ConcurrentProgramming.Data
         IVector Position { get; set; }
         double Diameter { get; init; }
 
+        public void LockAll() {}
+
+        public void UnLockAll() {}
         public void SetVelocity(double x, double y) { Velocity = new Vector(x, y); }
         public IVector GetVelocity() { return Velocity; }
 

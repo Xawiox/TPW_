@@ -20,6 +20,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
         private CancellationTokenSource _cancellationTokenSource = new();
         private Barrier _barrier;
+        private List<Ball> balls = new();
 
         public BusinessLogicImplementation() : this(null)
         { }
@@ -39,6 +40,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 throw new ObjectDisposedException(nameof(BusinessLogicImplementation));
             _cancellationTokenSource.Cancel();
             _cancellationTokenSource.Dispose();
+            balls.Clear();
             layerBellow.Dispose();
             Disposed = true;
         }
@@ -50,7 +52,6 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             if (upperLayerHandler == null)
                 throw new ArgumentNullException(nameof(upperLayerHandler));
             //layerBellow.Start(numberOfBalls, (startingPosition, databall) => upperLayerHandler(new Position(startingPosition.x, startingPosition.y), new Ball(databall), databall.Diameter));
-            List<Ball> balls = new();
             layerBellow.Start(numberOfBalls, (startingPosition, databall) =>
             {
                 Ball newBall = new(databall);
@@ -87,6 +88,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                     lastUpdate = now;
 
                     newBall.Move(deltaTime);
+                    //_barrier.SignalAndWait();
+                    newBall.CollideWithBalls(balls);
                     _barrier.SignalAndWait();
                     Thread.Sleep(10);
                 }

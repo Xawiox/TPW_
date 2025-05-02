@@ -32,75 +32,43 @@ namespace TP.ConcurrentProgramming.Data
         public IVector Velocity { get; set; }
         public double Diameter { get; init; } = 0;
 
+        public void LockAll()
+        {
+            _lockPosition.EnterWriteLock();
+            _lockVelocity.EnterWriteLock();
+        }
+
+        public void UnLockAll()
+        {
+            _lockVelocity.ExitWriteLock();
+            _lockPosition.ExitWriteLock();
+        }
 
         public void SetVelocity(double x, double y)
         {
-            _lockVelocity.EnterWriteLock();
-            try
-            {
-                this.Velocity = new Vector(x, y);
-            }
-            finally
-            {
-                _lockVelocity.ExitWriteLock();
-            }
+            this.Velocity = new Vector(x, y);
         }
 
         public IVector GetVelocity()
         {
-            _lockVelocity.EnterReadLock();
-            try
-            {
-                return this.Velocity;
-            }
-            finally
-            {
-                _lockVelocity.ExitReadLock();
-            }
+            return this.Velocity;
         }
 
         public void SetPosition(double x, double y)
         {
-            _lockPosition.EnterWriteLock();
-            try
-            {
-                this.Position = new Vector(x, y);
-            }
-            finally
-            {
-                _lockPosition.ExitWriteLock();
-            }
+            this.Position = new Vector(x, y);
+
         }
 
         public IVector GetPosition()
         {
-            _lockPosition.EnterReadLock();
-            try
-            {
-                return this.Position;
-            }
-            finally
-            {
-                _lockPosition.ExitReadLock();
-            }
+            return this.Position;
         }
         #endregion IBall
 
         #region private
 
         public IVector Position { get; set; }
-
-        //private void RaiseNewPositionChangeNotification()
-        //{
-        //    NewPositionNotification?.Invoke(this, Position);
-        //}
-
-        //internal void Move(double delta)
-        //{
-        //    //SetPosition(Position.x + delta * Velocity.x, Position.y + delta * Velocity.y);
-
-        //    RaiseNewPositionChangeNotification();
-        //}
 
         #endregion private
     }

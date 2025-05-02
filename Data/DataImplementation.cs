@@ -43,7 +43,7 @@ namespace TP.ConcurrentProgramming.Data
                 double angle = random.NextDouble() * 2 * Math.PI;
                 double xVelocity = velocity * Math.Cos(angle);
                 double yVelocity = velocity * Math.Sin(angle);
-                double initialDiameter = random.Next(10, 40);
+                double initialDiameter = random.Next(10, 50);
                 Vector startingVelocity = new(xVelocity, yVelocity);
                 Ball newBall = new(startingPosition, startingVelocity, initialDiameter);
                 upperLayerHandler(startingPosition, newBall);
@@ -63,8 +63,6 @@ namespace TP.ConcurrentProgramming.Data
             {
                 if (disposing)
                 {
-                    //_cancellationTokenSource.Cancel();
-                    //_cancellationTokenSource.Dispose();
 
                     BallsList.Clear();
                 }

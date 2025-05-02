@@ -86,6 +86,70 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             Assert.IsTrue(testBall.Position.x < 395.0);
         }
 
+        [TestMethod]
+        public void BallCollisionExistTest()
+        {
+            TestVector initialPosition1 = new TestVector(50.0, 20.0);
+            TestVector initialPosition2 = new TestVector(80.0, 10.0);
+            TestVector initialVelocity1 = new TestVector(15.0, 0.0);
+            TestVector initialVelocity2 = new TestVector(-10.0, 10.0);
+            TestBall testBall1 = new TestBall
+            {
+                Position = initialPosition1,
+                Velocity = initialVelocity1,
+                Diameter = 10.0
+            };
+            TestBall testBall2 = new TestBall
+            {
+                Position = initialPosition2,
+                Velocity = initialVelocity2,
+                Diameter = 10.0
+            };
+
+            Ball businessBall1 = new Ball(testBall1);
+            Ball businessBall2 = new Ball(testBall2);
+
+            businessBall1.Move(1);
+            businessBall2.Move(1);
+            businessBall1.CollideWithBalls(new List<Ball> { businessBall1,businessBall2 });
+            businessBall2.CollideWithBalls(new List<Ball> { businessBall1,businessBall2 });
+
+            Assert.IsTrue(testBall1.Velocity.x < 0.0);
+            Assert.IsTrue(testBall1.Position.x < 65.0);
+            Assert.IsTrue(testBall2.Velocity.x > 0.0);
+            Assert.IsTrue(testBall2.Position.x > 70.0);
+        }
+
+        [TestMethod]
+        public void BallCollisionMassIncludedTest()
+        {
+            TestVector initialPosition1 = new TestVector(60.0, 0.0);
+            TestVector initialPosition2 = new TestVector(100.0, 0.0);
+            TestVector initialVelocity1 = new TestVector(10.0, 0.0);
+            TestVector initialVelocity2 = new TestVector(-10.0, 0.0);
+            TestBall testBall1 = new TestBall
+            {
+                Position = initialPosition1,
+                Velocity = initialVelocity1,
+                Diameter = 10.0
+            };
+            TestBall testBall2 = new TestBall
+            {
+                Position = initialPosition2,
+                Velocity = initialVelocity2,
+                Diameter = 100.0
+            };
+
+            Ball businessBall1 = new Ball(testBall1);
+            Ball businessBall2 = new Ball(testBall2);
+
+            businessBall1.CollideWithBalls(new List<Ball> { businessBall1, businessBall2 });
+            businessBall2.CollideWithBalls(new List<Ball> { businessBall1, businessBall2 });
+
+            Assert.IsTrue(testBall1.Velocity.x < 0.0);
+            Assert.IsTrue(testBall2.Velocity.x < 0.0);
+        }
+
         public class TestVector : TP.ConcurrentProgramming.Data.IVector
         {
             public double x { get; init; }
