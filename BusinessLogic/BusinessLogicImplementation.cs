@@ -10,6 +10,7 @@
 
 using System.Diagnostics;
 using System.Threading;
+using TP.ConcurrentProgramming.Data;
 using UnderneathLayerAPI = TP.ConcurrentProgramming.Data.DataAbstractAPI;
 
 namespace TP.ConcurrentProgramming.BusinessLogic
@@ -75,24 +76,29 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
         private void StartBall(Ball newBall)
         {
+            
             Task.Run(() =>
             {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                long lastUpdate = stopwatch.ElapsedMilliseconds;
-                var token = _cancellationTokenSource.Token;
-                while (!token.IsCancellationRequested)
+                _barrier.SignalAndWait();
+                float framesPerSecond = 60;
+                System.Timers.Timer timer = new(1000 / framesPerSecond);
+                bool isBusy = false;
+                timer.Elapsed += (sender, args) =>
                 {
-                    long now = stopwatch.ElapsedMilliseconds;
-                    double deltaTime = (now - lastUpdate) / 1000.0;
-                    lastUpdate = now;
-
-                    newBall.Move(deltaTime);
-                    //_barrier.SignalAndWait();
+                    if (isBusy)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Nie zdążono wykonać operacji");
+                        return;
+                    }
+                    isBusy = true;
+                   
+                    newBall.Move(1.0 / framesPerSecond);
                     newBall.CollideWithBalls(balls);
-                    _barrier.SignalAndWait();
-                    Thread.Sleep(10);
-                }
+                    isBusy = false;
+                };
+                timer.AutoReset = true;
+                timer.Start();
+
             }, _cancellationTokenSource.Token);
         }
 
