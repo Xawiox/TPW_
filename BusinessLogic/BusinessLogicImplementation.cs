@@ -20,6 +20,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         #region ctor
 
         private CancellationTokenSource _cancellationTokenSource = new();
+        private DiagnosticsLogger _logger = new("./../../../../log.txt");
         private Barrier _barrier;
         private List<Ball> balls = new();
 
@@ -42,6 +43,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             _cancellationTokenSource.Cancel();
             _cancellationTokenSource.Dispose();
             balls.Clear();
+            _logger.Dispose();
             layerBellow.Dispose();
             Disposed = true;
         }
@@ -53,6 +55,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             if (upperLayerHandler == null)
                 throw new ArgumentNullException(nameof(upperLayerHandler));
             //layerBellow.Start(numberOfBalls, (startingPosition, databall) => upperLayerHandler(new Position(startingPosition.x, startingPosition.y), new Ball(databall), databall.Diameter));
+            
             layerBellow.Start(numberOfBalls, (startingPosition, databall) =>
             {
                 Ball newBall = new(databall);
@@ -87,13 +90,13 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 {
                     if (isBusy)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Nie zdążono wykonać operacji");
+                        _logger.Log($"Real-Time Error");
                         return;
                     }
                     isBusy = true;
                    
-                    newBall.Move(1.0 / framesPerSecond);
-                    newBall.CollideWithBalls(balls);
+                    newBall.Move(1.0 / framesPerSecond, _logger);
+                    newBall.CollideWithBalls(balls, _logger);
                     isBusy = false;
                 };
                 timer.AutoReset = true;

@@ -27,13 +27,13 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
         #endregion IBall
 
-        public void Move(double delta)
+        public void Move(double delta, DiagnosticsLoggerAbstractAPI _logger)
         {
             dataBall.LockAll();
             try
             {
                 dataBall.SetPosition(dataBall.GetPosition().x + delta * dataBall.GetVelocity().x, dataBall.GetPosition().y + delta * dataBall.GetVelocity().y);
-                StayInBox(0, 399, 0, 399);
+                StayInBox(0, 399, 0, 399, _logger);
             }
             finally
             {
@@ -41,7 +41,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             }
         }
 
-        public void CollideWithBalls(List<Ball> balls)
+        public void CollideWithBalls(List<Ball> balls, DiagnosticsLoggerAbstractAPI _logger)
         {
             foreach (var otherBall in balls)
             {
@@ -65,6 +65,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                     { 
                         if (CollideWithBall(otherBall))
                         {
+                            _logger.Log($"Ball Collided with ball. Ball1: Position: ({dataBall.GetPosition().x:F3}, {dataBall.GetPosition().y:F3}), Diamiter: {dataBall.Diameter} Ball2: Position: ({otherBall.dataBall.GetPosition().x:F3}, {otherBall.dataBall.GetPosition().y:F3}), Diamiter: {otherBall.dataBall.Diameter}");
                             HandleCollision(otherBall);
                         }                    
                     }
@@ -134,29 +135,41 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             );
         }
 
-        private void StayInBox(double left, double right, double Top, double Bottom)
+        private void StayInBox(double left, double right, double Top, double Bottom, DiagnosticsLoggerAbstractAPI _logger)
         {
             if (dataBall.GetPosition().x + dataBall.Diameter / 2 > right)
             {
-                dataBall.SetVelocity(-dataBall.GetVelocity().x, dataBall.GetVelocity().y);
+                double x = dataBall.GetVelocity().x;
+                double y = dataBall.GetVelocity().y;
+                dataBall.SetVelocity(-x, y);
                 dataBall.SetPosition(dataBall.GetPosition().x - (dataBall.GetPosition().x + dataBall.Diameter / 2 - right) * 2, dataBall.GetPosition().y);
+                _logger.Log($"Ball Collided with wall. old Velocity: ({x:F3}, {y:F3}) , new Velocity: ({dataBall.GetVelocity().x:F3}, {dataBall.GetVelocity().y:F3})");
             }
             if (dataBall.GetPosition().x - dataBall.Diameter / 2 < left)
             {
-                dataBall.SetVelocity(-dataBall.GetVelocity().x, dataBall.GetVelocity().y);
+                double x = dataBall.GetVelocity().x;
+                double y = dataBall.GetVelocity().y;
+                dataBall.SetVelocity(-x, y);
                 dataBall.SetPosition(dataBall.GetPosition().x + (left - (dataBall.GetPosition().x - dataBall.Diameter / 2)) * 2, dataBall.GetPosition().y);
+                _logger.Log($"Ball Collided with wall. old Velocity: ({x:F3}, {y:F3}) , new Velocity: ({dataBall.GetVelocity().x:F3}, {dataBall.GetVelocity().y:F3})");
             }
 
             if (dataBall.GetPosition().y + dataBall.Diameter / 2 > Bottom)
             {
-                dataBall.SetVelocity(dataBall.GetVelocity().x, -dataBall.GetVelocity().y);
+                double x = dataBall.GetVelocity().x;
+                double y = dataBall.GetVelocity().y;
+                dataBall.SetVelocity(x, -y);
                 dataBall.SetPosition(dataBall.GetPosition().x, dataBall.GetPosition().y - (dataBall.GetPosition().y + dataBall.Diameter / 2 - Bottom) * 2);
+                _logger.Log($"Ball Collided with wall. old Velocity: ({x:F3}, {y:F3}) , new Velocity: ({dataBall.GetVelocity().x:F3}, {dataBall.GetVelocity().y:F3})");
             }
 
             if (dataBall.GetPosition().y - dataBall.Diameter / 2 < Top)
             {
-                dataBall.SetVelocity(dataBall.GetVelocity().x, -dataBall.GetVelocity().y);
+                double x = dataBall.GetVelocity().x;
+                double y = dataBall.GetVelocity().y;
+                dataBall.SetVelocity(x, -y);
                 dataBall.SetPosition(dataBall.GetPosition().x, dataBall.GetPosition().y + (Top - (dataBall.GetPosition().y - dataBall.Diameter / 2)) * 2);
+                _logger.Log($"Ball Collided with wall. old Velocity: ({x:F3}, {y:F3}) , new Velocity: ({dataBall.GetVelocity().x:F3}, {dataBall.GetVelocity().y:F3})");
             }
 
         }
