@@ -83,7 +83,6 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
             Task.Run(() =>
             {
-                _barrier.SignalAndWait();
                 System.Timers.Timer timer = new(10000);
                 timer.Elapsed += (sender, args) =>
                 {
