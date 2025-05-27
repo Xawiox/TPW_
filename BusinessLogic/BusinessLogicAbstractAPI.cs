@@ -63,6 +63,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
     public interface IBall
     {
         event EventHandler<IPosition> NewPositionNotification;
+        event EventHandler<bool> NewColorNotification;
     }
 
 

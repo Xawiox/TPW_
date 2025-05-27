@@ -67,6 +67,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             {
                 StartBall(ball);
             }
+            StartChangingColors();
         }
 
         #endregion BusinessLogicAbstractAPI
@@ -77,30 +78,51 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
         private readonly UnderneathLayerAPI layerBellow;
 
+        private void StartChangingColors()
+        {
+
+            Task.Run(() =>
+            {
+                _barrier.SignalAndWait();
+                System.Timers.Timer timer = new(10000);
+                timer.Elapsed += (sender, args) =>
+                {
+                    foreach (Ball ball in balls)
+                    {
+                        ball.changeDataBallColor(_logger);
+                    }
+                    _logger.Log($"Changing colors of {balls.Count} balls");
+                };
+                timer.AutoReset = true;
+                timer.Start();
+
+            }, _cancellationTokenSource.Token);
+        }
+
         private void StartBall(Ball newBall)
         {
             
             Task.Run(() =>
             {
-                _barrier.SignalAndWait();
-                float framesPerSecond = 60;
-                System.Timers.Timer timer = new(1000 / framesPerSecond);
-                bool isBusy = false;
-                timer.Elapsed += (sender, args) =>
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                long lastUpdate = stopwatch.ElapsedMilliseconds;
+                var token = _cancellationTokenSource.Token;
+                while (!token.IsCancellationRequested)
                 {
-                    if (isBusy)
-                    {
-                        _logger.Log($"Real-Time Error");
-                        return;
-                    }
-                    isBusy = true;
-                   
-                    newBall.Move(1.0 / framesPerSecond, _logger);
+                    _barrier.SignalAndWait();
+
+                    long now = stopwatch.ElapsedMilliseconds;
+                    double deltaTime = (now - lastUpdate) / 1000.0;
+                    lastUpdate = now;
+
+                    newBall.Move(deltaTime, _logger);
+                    //_barrier.SignalAndWait();
                     newBall.CollideWithBalls(balls, _logger);
-                    isBusy = false;
-                };
-                timer.AutoReset = true;
-                timer.Start();
+                    _barrier.SignalAndWait();
+                    Thread.Sleep(10);
+
+                }
 
             }, _cancellationTokenSource.Token);
         }

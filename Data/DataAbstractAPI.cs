@@ -67,6 +67,8 @@ namespace TP.ConcurrentProgramming.Data
         public void SetVelocity(double x, double y) { Velocity = new Vector(x, y); }
         public IVector GetVelocity() { return Velocity; }
 
+        public bool changeColor() { return false; }
+
         public void SetPosition(double x, double y) { Position = new Vector(x, y); }
         public IVector GetPosition() { return Position; }
     }

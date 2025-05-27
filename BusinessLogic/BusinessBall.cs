@@ -8,6 +8,7 @@
 //
 //_____________________________________________________________________________________________________________________________________
 
+using System.Drawing;
 using System.Numerics;
 using TP.ConcurrentProgramming.Data;
 
@@ -24,8 +25,14 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         #region IBall
 
         public event EventHandler<IPosition>? NewPositionNotification;
+        public event EventHandler<bool>? NewColorNotification;
 
         #endregion IBall
+
+        public void changeDataBallColor(DiagnosticsLoggerAbstractAPI _logger)
+        {
+            NewColorNotification?.Invoke(this, dataBall.changeColor());
+        }
 
         public void Move(double delta, DiagnosticsLoggerAbstractAPI _logger)
         {

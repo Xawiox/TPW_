@@ -25,8 +25,19 @@
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Ellipse Width= "{Binding Diameter}" Height="{Binding Diameter}" Fill="Blue" />
-					</DataTemplate>
+                        <Ellipse Width="{Binding Diameter}" Height="{Binding Diameter}">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="Blue" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ChangeColor}" Value="True">
+                                            <Setter Property="Fill" Value="BlueViolet" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                    </DataTemplate>
 				</ItemsControl.ItemTemplate>
 				<ItemsControl.ItemContainerStyle>
 					<Style TargetType="ContentPresenter">

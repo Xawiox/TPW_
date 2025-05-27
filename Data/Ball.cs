@@ -8,6 +8,8 @@
 //
 //_____________________________________________________________________________________________________________________________________
 
+using System.Drawing;
+
 namespace TP.ConcurrentProgramming.Data
 {
     internal class Ball : IBall
@@ -21,6 +23,7 @@ namespace TP.ConcurrentProgramming.Data
             Position = initialPosition;
             Velocity = initialVelocity;
             Diameter = initialDiameter;
+            ChangeColor  = false;
         }
 
         #endregion ctor
@@ -32,6 +35,7 @@ namespace TP.ConcurrentProgramming.Data
         public IVector Velocity { get; set; }
         public double Diameter { get; init; } = 0;
 
+        public bool ChangeColor { get; set; } = false;
         public void LockAll()
         {
             _lockPosition.EnterWriteLock();
@@ -63,6 +67,12 @@ namespace TP.ConcurrentProgramming.Data
         public IVector GetPosition()
         {
             return this.Position;
+        }
+
+        public bool changeColor()
+        {
+            ChangeColor = !ChangeColor;
+            return ChangeColor;
         }
         #endregion IBall
 

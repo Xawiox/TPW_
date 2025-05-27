@@ -20,12 +20,13 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         [TestMethod]
         public void MoveTestMethod()
         {
+            TestLogger testLogger = new TestLogger();  
             VectorFixture fixturePosition = new(0.0, 0.0);
             double fixtureDiameter = 0.0;
             VectorFixture fixtureVelocity = new(0.0, 0.0);
             DataBallFixture dataBallFixture = new DataBallFixture(fixturePosition, fixtureVelocity, fixtureDiameter);
             Ball newInstance = new(dataBallFixture);
-            newInstance.Move(1);
+            newInstance.Move(1, testLogger);
             Assert.AreNotEqual<IVector>(fixturePosition, dataBallFixture.Position);
         }
 
@@ -69,6 +70,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         [TestMethod]
         public void BallBounceTest()
         {
+            TestLogger testLogger = new TestLogger();
             TestVector initialPosition = new TestVector(395.0, 20.0);
             TestVector initialVelocity = new TestVector(20.0, 0.0);
             TestBall testBall = new TestBall
@@ -80,7 +82,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
 
             Ball businessBall = new Ball(testBall);
 
-            businessBall.Move(1);
+            businessBall.Move(1, testLogger);
 
             Assert.AreEqual(-20.0, testBall.Velocity.x);
             Assert.IsTrue(testBall.Position.x < 395.0);
@@ -89,6 +91,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         [TestMethod]
         public void BallCollisionExistTest()
         {
+            TestLogger testLogger = new TestLogger();
             TestVector initialPosition1 = new TestVector(50.0, 20.0);
             TestVector initialPosition2 = new TestVector(80.0, 10.0);
             TestVector initialVelocity1 = new TestVector(15.0, 0.0);
@@ -109,10 +112,10 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             Ball businessBall1 = new Ball(testBall1);
             Ball businessBall2 = new Ball(testBall2);
 
-            businessBall1.Move(1);
-            businessBall2.Move(1);
-            businessBall1.CollideWithBalls(new List<Ball> { businessBall1,businessBall2 });
-            businessBall2.CollideWithBalls(new List<Ball> { businessBall1,businessBall2 });
+            businessBall1.Move(1, testLogger);
+            businessBall2.Move(1, testLogger);
+            businessBall1.CollideWithBalls(new List<Ball> { businessBall1,businessBall2 }, testLogger);
+            businessBall2.CollideWithBalls(new List<Ball> { businessBall1,businessBall2 }, testLogger);
 
             Assert.IsTrue(testBall1.Velocity.x < 0.0);
             Assert.IsTrue(testBall1.Position.x < 65.0);
@@ -123,6 +126,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         [TestMethod]
         public void BallCollisionMassIncludedTest()
         {
+            TestLogger testLogger = new TestLogger();
             TestVector initialPosition1 = new TestVector(60.0, 0.0);
             TestVector initialPosition2 = new TestVector(100.0, 0.0);
             TestVector initialVelocity1 = new TestVector(10.0, 0.0);
@@ -143,8 +147,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             Ball businessBall1 = new Ball(testBall1);
             Ball businessBall2 = new Ball(testBall2);
 
-            businessBall1.CollideWithBalls(new List<Ball> { businessBall1, businessBall2 });
-            businessBall2.CollideWithBalls(new List<Ball> { businessBall1, businessBall2 });
+            businessBall1.CollideWithBalls(new List<Ball> { businessBall1, businessBall2 }, testLogger);
+            businessBall2.CollideWithBalls(new List<Ball> { businessBall1, businessBall2 }, testLogger);
 
             Assert.IsTrue(testBall1.Velocity.x < 0.0);
             Assert.IsTrue(testBall2.Velocity.x < 0.0);
@@ -183,6 +187,18 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             {
                 NewPositionNotification?.Invoke(this, Position);
             }
+        }
+
+        public class TestLogger : DiagnosticsLoggerAbstractAPI
+        {
+            public override void Log(String data) { 
+            }
+
+            #region IDisposable
+
+            public override void Dispose() { }
+
+            #endregion IDisposable
         }
     }
 }
